@@ -8,6 +8,8 @@
 
 #define MIL_TO_SEC  1000
 #define None        0x7FFFFFFF
+#define SCROLL_UP   1
+#define SCROLL_DOWN -1
 
 class Easyscript {
 private:
@@ -33,7 +35,6 @@ public:
     }
     ~Easyscript() = default;
     Easyscript(const Easyscript&) = delete; // Delete if they try to use '=' initializer
-    Easyscript& operator=(const Easyscript&) = delete; // Delete if they try to set equal
 
     // These functions are for variable setting
 
@@ -82,7 +83,7 @@ public:
 
         // Catch people who try to put negative clicks
         if (clicks < 0)
-            clicks = 0;
+            return;
 
         // Only move if a real mouse pos is given
         if (x != None || y != None)
@@ -90,7 +91,6 @@ public:
 
         // Input struct
         INPUT in[2];
-        ZeroMemory(in, sizeof(in));
 
         // Flags for mouse down and up
         in[0].type = INPUT_MOUSE;
@@ -98,13 +98,87 @@ public:
         in[1].type = INPUT_MOUSE;
         in[1].mi.dwFlags = MOUSEEVENTF_LEFTUP;
 
-        // uS is currently not used but still stored
-        UINT uS = SendInput(2, in, sizeof(INPUT));
+        // Send the click
+        SendInput(2, in, sizeof(INPUT));
 
         // Main loop for going through mouse input, extra click already accounted for
         for (int i = 1; i < clicks; i++) {
             this->sleep(timeBetweenClicks);
-            uS = SendInput(2, in, sizeof(INPUT));
+            SendInput(2, in, sizeof(INPUT));
+        }
+        rest();
+    }
+
+    void scroll(int scrollDirection = SCROLL_DOWN, int scrolls = 1, double timeBetweenScrolls = 0.1) {
+        // Ensure a proper scroll direction is given
+        if (scrollDirection != SCROLL_UP && scrollDirection != SCROLL_DOWN)
+            return;
+        
+        INPUT in[1];
+
+        // Flags for mouse down and up
+        in->type = INPUT_MOUSE;
+        in->mi.dwFlags = MOUSEEVENTF_WHEEL;
+        in->mi.mouseData = scrollDirection * 100;
+
+        // Send the click
+        SendInput(1, in, sizeof(INPUT));
+
+        // Main loop for going through mouse input, extra click already accounted for
+        for (int i = 1; i < scrolls; i++) {
+            this->sleep(timeBetweenScrolls);
+            SendInput(1, in, sizeof(INPUT));
+        }
+        rest();
+    }
+
+    // keys - a string that will get types automatically
+    // timeBetweenKeys - time in seconds between each key input
+    // this function will NOT use special characters
+    // use "specialKeyInput()" for special keys
+    void keyInput(string keys, double timeBetweenKeys = 0.1) {
+        INPUT in[2];
+
+        in[0].type = INPUT_KEYBOARD;
+        in[0].ki.wVk = toupper(keys[0]);
+        in[0].ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
+
+        in[1].type = INPUT_KEYBOARD;
+        in[1].ki.wVk = toupper(keys[0]);
+        in[1].ki.dwFlags = KEYEVENTF_KEYUP;
+        
+        SendInput(2, in, sizeof(INPUT));
+
+        // Main loop for going through keys in string
+        for (int i = 1; i < keys.length(); i++) {
+            in[0].type = INPUT_KEYBOARD;
+            in[0].ki.wVk = toupper(keys[i]);
+            in[0].ki.dwFlags = KEYEVENTF_EXTENDEDKEY;
+
+            in[1].type = INPUT_KEYBOARD;
+            in[1].ki.wVk = toupper(keys[i]);
+            in[1].ki.dwFlags = KEYEVENTF_KEYUP;
+            
+            this->sleep(timeBetweenKeys);
+            SendInput(2, in, sizeof(INPUT));
+        }
+        rest();
+    }
+
+    // key - a special key, use defined values. EX: VK_CAPITAL, VK_BACK
+    void specialKeyInput(int key, int repeatKey = 1, double repeatKeyDelay = 0.1) {
+        INPUT in[2];
+
+        for(int i = 0; i < repeatKey; i++) {
+            in[0].type = INPUT_KEYBOARD;
+            in[0].ki.wVk = key;
+
+            in[1].type = INPUT_KEYBOARD;
+            in[1].ki.wVk = key;
+            in[1].ki.dwFlags = KEYEVENTF_KEYUP;
+
+            SendInput(2, in, sizeof(INPUT));
+            this->sleep(repeatKeyDelay);
         }
         rest();
     }
