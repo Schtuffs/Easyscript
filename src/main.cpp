@@ -1,9 +1,6 @@
 #include <iostream>
-#include "Easyscript.hpp"
-
-using namespace std;
+#include "../include/Easyscript.hpp"
 
 int main(int argc, char* argv[]) {
-    
 }
 

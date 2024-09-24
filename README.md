@@ -1,22 +1,16 @@
 # Welcome to Easyscript!
+ To use, simply create an object with the Easyscript class and start using some functions! 
+ On Windows, to compile with g++ you will need to add the '-lgdi32' tag after. 
+ Ex: 'g++ -o main *.cpp -lgdi32'.
 
 ## Newest Features
 
-### Snipping tool
-This allows you to enter a start (x, y) and a width and height to return a 1d 
-array of pixels. If you also enter a filename it will save an image in the 
-.exe filepath, requires proper filetype (ex .png, .jpeg, .bmp, etc.).
-
-### Keyboard input
-There are 2 functions that allow you to enter keyboard input. The first takes a 
-string as a parameter and then retypes it out. The second is for special keys 
-and allows you to hit keys such as arrows or 'enter' key. These functions currently 
-do not work in non-text applications since they do not send the same ascii values 
-that these programs are used to.
-
-### Scroll
-This lets you simulate mouse scrolls. You can scroll up or down depending on the 
-parameters you send to the function.
+### Improved keyboard input
+ The old way the function worked seemed to only work for things 
+ such as text documents. Now, it seems to work with games as well. 
+ Meaning that this will work for its intended use of trying to script 
+ some menial tasks, both for games, and for other programs that didn't like 
+ the virtual keys.
 
 ## Plans for additions.
 
@@ -31,9 +25,8 @@ where an image is and be able to give back its (x, y) coordinates. Scaling and
 maybe rotation will be attempted to be added later.
 
 ### Other OS's
-Currently know it works for windows, will check functionality on linux. MacOS 
-is unknown right now since I do not have any Mac systems. Most likely will not 
-do anything with Darwin since I believe its unsupported now.
+Currently know it works for windows, will check functionality on linux. Very unlikely 
+that I will figure out if it works on Mac.
 
 ### A way to sense key inputs
 This is less likely to be added next, but a way to sense if/when a key is pressed 
@@ -48,7 +41,8 @@ program.
 ## General maintenance
 
 ### Code improvements
-Will be refactoring code as I learn better (more efficient or faster) methods.
+ Reformatted with include and src directories. Code moved out of 
+ .hpp and into .cpp files.
 
 ### Updates and main maintenance
 New features will be added as I learn more. Maintenance for bugs will be fixed 
