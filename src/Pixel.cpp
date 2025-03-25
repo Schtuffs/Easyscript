@@ -1,4 +1,4 @@
-#include "../include/Pixel.hpp"
+#include "Pixel.h"
 
 Pixel::Pixel() {
     this->_r = 0;
@@ -42,33 +42,37 @@ std::ostream& operator<<(std::ostream& cout, Pixel& pix) {
 Pixel Pixel::getPixel(int x, int y) {
     // Gets the whole screen's content
     HDC screen = GetDC(NULL);
-
+    
     // Gets the pixel colour
     COLORREF c = GetPixel(screen, x, y);
-
+    
     // Release the Device Content
     ReleaseDC(NULL, screen);
-
+    
     // Copy data to my Pixel struct
     this->_r = (short)GetRValue(c);
     this->_g = (short)GetGValue(c);
     this->_b = (short)GetBValue(c);
-
+    
     return *this;
 }
 
-// X - Top left X coordinate
-// Y - Top left Y coordinate
-// Width - Width of frame to copy
-// Height - Height of frame to copy
-// Add filename if you want to save the image, use .bmp file extension
+// Gets pixel colour at given coordinate
+// pos - Point struct with coordinates to get pixel colour from
+Pixel Pixel::getPixel(Point pos) {
+    return this->getPixel(pos.x, pos.y);
+}
+
+// xStart - Top left X coordinate
+// yStart - Top left Y coordinate
+// width - Width of frame to copy
+// height - Height of frame to copy
+// filename - filename for saved file
+// Only add if you want to save the image, use .bmp file extension
+// returnPixels - returns a pointer to an array of 
 // Warning - returns a malloced array if returnPixels == true, you must free it
-Pixel* Pixel::snip(int xStart, int yStart, int width, int height, const char* filename, bool returnPixels) {
-    // Initialized now so it exists incase of errors later
-    Pixel* pixels = nullptr;
-    if (returnPixels) {
-        pixels = new Pixel[width * height];
-    }
+std::vector<Pixel> Pixel::snip(int xStart, int yStart, int width, int height, const char* filename, bool returnPixels) {
+    std::vector<Pixel> pixels;
 
     // Gets DC of the screen
     HDC hdcScreen = GetDC(NULL);
@@ -114,9 +118,8 @@ Pixel* Pixel::snip(int xStart, int yStart, int width, int height, const char* fi
     // Saves pixels before attempting to open file
     if (returnPixels) {
         for(int i = 0; i < width * height; i++) {
-            pixels[i]._r = rgbPixels[i].rgbRed;
-            pixels[i]._g = rgbPixels[i].rgbGreen;
-            pixels[i]._b = rgbPixels[i].rgbBlue;
+            Pixel p(rgbPixels[i].rgbRed, rgbPixels[i].rgbGreen, rgbPixels[i].rgbBlue);
+            pixels.push_back(p);
         }
     }
     delete [] rgbPixels;

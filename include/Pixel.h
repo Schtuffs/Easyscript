@@ -1,10 +1,27 @@
 #pragma once
 
+#ifdef DLL
+#ifdef PIXEL_EXPORTS
+#define PIXEL_API __declspec(dllexport)
+#else
+#define PIXEL_API __declspec(dllimport)
+#endif // Pixel api
+
+#else
+// Define as nothing
+#define PIXEL_API
+#endif // DLL
+
 #include <windows.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
-class Pixel {
+typedef struct {
+    long x, y;
+} Point;
+
+class PIXEL_API Pixel {
 private:
     short _r, _g, _b;
     
@@ -22,6 +39,7 @@ public:
     // X - X coordinate to get pixel colour from
     // Y - Y coordinate to get pixel colour from
     Pixel getPixel(int x, int y);
+    Pixel getPixel(Point pos);
 
     // X - Top left X coordinate
     // Y - Top left Y coordinate
@@ -29,7 +47,7 @@ public:
     // Height - Height of frame to copy
     // Add filename if you want to save the image, use .bmp file extension
     // Warning - returns a malloced array if returnPixels == true, you must free it
-    Pixel* snip(int xStart, int yStart, int width, int height, const char* filename = nullptr, bool returnPixels = true);
+    std::vector<Pixel> snip(int xStart, int yStart, int width, int height, const char* filename = nullptr, bool returnPixels = true);
 
     // Pass a pixel, and it determines the similarity to the most recently checked pixel
     // Variance - how much off each RGB value can be and still be considered the same

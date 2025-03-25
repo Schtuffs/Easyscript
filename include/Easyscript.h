@@ -1,9 +1,23 @@
 #pragma once
 
+#ifdef DLL
+#ifdef EASYSCRIPT_EXPORTS
+#define EASYSCRIPT_API __declspec(dllexport)
+#else
+#define EASYSCRIPT_API __declspec(dllimport)
+#endif // Easycript api
+
+#else
+// Define as nothing
+#define EASYSCRIPT_API
+#endif // DLL
+
 #include <windows.h>
 #include <iostream>
 
-#include "Pixel.hpp"
+#include "Pixel.h"
+
+typedef int EsKey;
 
 #define MIL_TO_SEC  1000
 #define None        0x7FFFFFFF
@@ -51,7 +65,7 @@
 #define ES_KEY_ACTION_RELEASE 0x1002
 #define ES_KEY_ACTION_DUAL    0x1003
 
-class Easyscript {
+class EASYSCRIPT_API Easyscript {
 private:
     // PAUSE - amount of time to pause after each Easyscript call
     double PAUSE;
@@ -75,28 +89,37 @@ public:
     double getPause();
 
     // Returns the mouse position with POINT struct
-    POINT getMousePos();
+    Point getMousePos();
 
     // Time - amount of time to sleep in seconds
     void sleep(double time);
 
     // X - X coordinate of click
     // Y - Y coordinate of click
-    // Clicks - how many clicks will be performed
+    // clicks - how many clicks will be performed
     // timeBetweenClicks - how much time will elapse between clicks
     void click(int x = None, int y = None, int clicks = 1, double timeBetweenClicks = 0.1);
+    
+    // pos - Position to move the mouse to
+    // clicks - how many clicks will be performed
+    // timeBetweenClicks - how much time will elapse between clicks
+    void click(Point pos, int clicks = 1, double timeBetweenClicks = 0.1);
 
+    // scrollDirection - Which way to scroll the mouse
+    // scrolls - How many times to scroll
+    // timeBetweenScrolls - If more than 1 scroll, delay between each scroll
     void scroll(int scrollDirection = SCROLL_DOWN, int scrolls = 1, double timeBetweenScrolls = 0.1);
 
     // key - key to be pressed
     // pressType - whether the key should be pressed down, released, or both
     // holdKey - how long a key should be held for. Only works if pressType == ES_KEY_ACTION_DUAL
-    // this function will NOT use special characters
-    // use "specialKeyInput()" for special keys
-    void keyInput(int key, int pressType = ES_KEY_ACTION_DUAL, double holdKey = 0.0);
+    void keyInput(EsKey key, int pressType = ES_KEY_ACTION_DUAL, double holdKey = 0.0);
 
     // X - X coordinate to move to
     // Y - Y coordinate to move to
     void move(int x, int y);
+
+    // Pos - position for where to move the mouse to
+    void move(Point pos);
 };
 

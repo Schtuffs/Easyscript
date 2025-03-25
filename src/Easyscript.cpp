@@ -1,4 +1,4 @@
-#include "../include/Easyscript.hpp"
+#include "Easyscript.h"
 
 Easyscript::Easyscript(double pause) {
     this->PAUSE = pause;
@@ -21,17 +21,21 @@ double Easyscript::getPause() {
     return this->PAUSE;
 }
 
-POINT Easyscript::getMousePos() {
+Point Easyscript::getMousePos() {
     POINT cPos;
-    int x = GetCursorPos(&cPos);
+    GetCursorPos(&cPos);
     rest();
-    return cPos;
+    return Point{cPos.x, cPos.y};
 }
 
 void Easyscript::sleep(double time) {
     if (time <= 0)
         return;
     Sleep(time * MIL_TO_SEC);
+}
+
+void Easyscript::click(Point pos, int clicks, double timeBetweenClicks) {
+    this->click(pos.x, pos.y, clicks, timeBetweenClicks);
 }
 
 void Easyscript::click(int x, int y, int clicks, double timeBetweenClicks) {
@@ -90,7 +94,7 @@ void Easyscript::scroll(int scrollDirection, int scrolls, double timeBetweenScro
     rest();
 }
 
-void Easyscript::keyInput(int key, int pressType, double holdKey) {
+void Easyscript::keyInput(EsKey key, int pressType, double holdKey) {
     // Create and setup input struct with constant data
     INPUT in = {0};
     in.type = INPUT_KEYBOARD;
@@ -116,7 +120,17 @@ void Easyscript::keyInput(int key, int pressType, double holdKey) {
     rest();
 }
 
+void Easyscript::move(Point pos) {
+    this->move(pos.x, pos.y);
+}
+
 void Easyscript::move(int x, int y) {
+    // Early return on no move
+    if (x == None && y == None) {
+        rest();
+        return;
+    }
+
     // Point object incase either of the values are defaulted
     POINT p{};
     GetCursorPos(&p);
@@ -136,3 +150,8 @@ Easyscript::~Easyscript() {
     // Nothing todo
 }
 
+#ifdef DLL
+int main(void) {
+    return 0;
+}
+#endif
